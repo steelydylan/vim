@@ -4522,6 +4522,7 @@ mch_new_shellsize(void)
     // Nothing to do.
 }
 
+#ifndef USE_SYSTEM
 /*
  * Wait for process "child" to end.
  * Return "child" if it exited properly, <= 0 on error.
@@ -4548,14 +4549,15 @@ wait4pid(pid_t child, waitstatus *status)
 	    continue;
 	}
 	if (wait_pid <= 0
-#ifdef ECHILD
+# ifdef ECHILD
 		&& errno == ECHILD
-#endif
+# endif
 	   )
 	    break;
     }
     return wait_pid;
 }
+#endif
 
 #if !defined(USE_SYSTEM) || defined(FEAT_JOB_CHANNEL)
 /*
@@ -4688,25 +4690,27 @@ open_pty(int *pty_master_fd, int *pty_slave_fd, char_u **name1, char_u **name2)
 }
 #endif
 
+#ifndef USE_SYSTEM
 /*
  * Send SIGINT to a child process if "c" is an interrupt character.
  */
     static void
 may_send_sigint(int c UNUSED, pid_t pid UNUSED, pid_t wpid UNUSED)
 {
-#ifdef SIGINT
+# ifdef SIGINT
     if (c == Ctrl_C || c == intr_char)
     {
-# ifdef HAVE_SETSID
+#  ifdef HAVE_SETSID
 	kill(-pid, SIGINT);
-# else
+#  else
 	kill(0, SIGINT);
-# endif
+#  endif
 	if (wpid > 0)
 	    kill(wpid, SIGINT);
     }
-#endif
+# endif
 }
+#endif
 
 #if !defined(USE_SYSTEM) || defined(FEAT_TERMINAL)
 

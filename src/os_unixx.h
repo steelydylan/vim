@@ -15,21 +15,17 @@
 # include <sys/ioctl.h>
 #endif
 
-#ifndef USE_SYSTEM	// use fork/exec to start the shell
+#if defined(HAVE_SYS_WAIT_H)
+# include <sys/wait.h>
+#endif
 
-# if defined(HAVE_SYS_WAIT_H)
-#  include <sys/wait.h>
-# endif
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) (((stat_val) >> 8) & 0377)
+#endif
 
-# ifndef WEXITSTATUS
-#  define WEXITSTATUS(stat_val) (((stat_val) >> 8) & 0377)
-# endif
-
-# ifndef WIFEXITED
-#  define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
-# endif
-
-#endif // !USE_SYSTEM
+#ifndef WIFEXITED
+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif
 
 #ifdef HAVE_STROPTS_H
 # ifdef sinix
